@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:servicios_ya_ve/views/screens/page_switcher.dart';
 import 'package:servicios_ya_ve/views/utils/AppColor.dart';
 import 'package:servicios_ya_ve/views/widgets/modals/login_modal.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+
+List<String> typesDocs = ["V", "E", "J", "P"];
+List<String> typesPhones = ["412", "414", "416", "424", "426", "212"];
 
 class RegisterModal extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
@@ -9,6 +13,26 @@ class RegisterModal extends StatelessWidget {
   final _fullNameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
+  String type_doc = typesDocs.first;
+  String code_phone = typesPhones.first;
+
+  var maskFormatter = MaskTextInputFormatter(
+      mask: '###-####',
+      filter: {"#": RegExp(r'[0-9]')},
+      type: MaskAutoCompletionType.lazy);
+
+  @override
+  void initState() {
+    // emailController.text = MyUtils.profile!.emailDeflt!;
+
+    getDefaultData();
+
+    // Inicialmente, mostramos todas las preguntas
+  }
+
+  getDefaultData() async {}
+
   @override
   Widget build(BuildContext context) {
     return Wrap(
@@ -56,18 +80,26 @@ class RegisterModal extends StatelessWidget {
                 child: Column(
                   children: [
                     TextFormField(
-                      controller: _emailController,
+                      controller: _fullNameController,
                       decoration: const InputDecoration(
-                        labelText: 'Correo',
-                        hintText: 'tucorreo@email.com',
+                        labelText: 'Nombre ',
+                        hintText: 'Tu nombre',
                       ),
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _fullNameController,
                       decoration: const InputDecoration(
-                        labelText: 'Nombre Completo',
-                        hintText: 'Tu nombre completo',
+                        labelText: 'Apellido ',
+                        hintText: 'Tu apellido',
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(
+                        labelText: 'Correo',
+                        hintText: 'tucorreo@email.com',
                       ),
                     ),
                     const SizedBox(height: 16),

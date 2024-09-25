@@ -34,15 +34,16 @@ class WelcomePage extends StatelessWidget {
                     children: [
                       Padding(
                         padding: EdgeInsets.only(bottom: 16, top: 42),
-                        child: Text('Gestiona tu Negocio',
+                        child: Text('Contrata u ofrece servicios',
                             style: TextStyle(
                                 fontFamily: 'inter',
                                 fontWeight: FontWeight.w700,
                                 fontSize: 26,
-                                color: Colors.white)),
+                                color: Color.fromARGB(255, 0, 0, 0))),
                       ),
-                      Text("El control de tu negocio en la palma de tu mano.",
-                          style: TextStyle(color: Colors.white)),
+                      Text("Optimiza tu tiempo y agiliza la contratación.",
+                          style:
+                              TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
                     ],
                   ),
                   Column(
@@ -102,12 +103,12 @@ class WelcomePage extends StatelessWidget {
                             );
                           },
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.white,
+                            foregroundColor:
+                                const Color.fromARGB(255, 255, 255, 255),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10)),
-                            side: BorderSide(
-                                color: AppColor.secondary.withOpacity(0.5),
-                                width: 1),
+                            side:
+                                BorderSide(color: AppColor.secondary, width: 1),
                           ),
                           child: Text('Iniciar Sesion',
                               style: TextStyle(
@@ -117,13 +118,14 @@ class WelcomePage extends StatelessWidget {
                                   fontFamily: 'inter')),
                         ),
                       ),
+                      const SizedBox(height: 30),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         margin: const EdgeInsets.only(top: 32),
                         child: RichText(
                           textAlign: TextAlign.center,
                           text: TextSpan(
-                            text: 'Al usar Artlex, estás aceptando nuestros ',
+                            text: 'Al usar ServiciosYa, estás aceptando nuestros ',
                             style: TextStyle(
                                 color: Colors.white.withOpacity(0.6),
                                 height: 150 / 100),
