@@ -1,8 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:servicios_ya_ve/views/screens/page_switcher.dart';
 import 'package:servicios_ya_ve/views/utils/AppColor.dart';
 import 'package:servicios_ya_ve/views/widgets/modals/login_modal.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+
+String typeDniSelected = "V";
+String typePhoneSelected = "412";
 
 List<String> typesDocs = ["V", "E", "J", "P"];
 List<String> typesPhones = ["412", "414", "416", "424", "426", "212"];
@@ -13,22 +18,69 @@ class RegisterModal extends StatelessWidget {
   final _fullNameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
   String type_doc = typesDocs.first;
   String code_phone = typesPhones.first;
-
-  var maskFormatter = MaskTextInputFormatter(
-      mask: '###-####',
-      filter: {"#": RegExp(r'[0-9]')},
-      type: MaskAutoCompletionType.lazy);
+  TextEditingController _fechaNacimientoController = TextEditingController();
+  DateTime? selectedDate;
 
   @override
   void initState() {
     // emailController.text = MyUtils.profile!.emailDeflt!;
 
     getDefaultData();
-
+    selectedDate = DateTime.now();
     // Inicialmente, mostramos todas las preguntas
+  }
+
+  String? validateNumber(phone) {
+    var t = r'[0-9]{3}\-[0-9]{4}';
+    String pattern = t;
+    RegExp regex = RegExp(pattern);
+    if (!regex.hasMatch(phone) && phone != null && phone != "") {
+      return 'Ingrese un número de teléfono válido';
+    } else {
+      return null;
+    }
+  }
+
+  bool _isChecked = false;
+  String _fechaNacimiento = '';
+
+  void _onChanged(String value) {
+    if (_isChecked) {
+      // Formatear la fecha en DD/MM/YYYY
+      if (value.length == 8) {
+        // Asegúrate de que el usuario ingrese 8 dígitos
+        String dia = value.substring(0, 2);
+        String mes = value.substring(2, 4);
+        String anio = value.substring(4, 8);
+
+        _fechaNacimiento = '$dia/$mes/$anio';
+      }
+    }
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null && picked != selectedDate) {
+      selectedDate = picked;
+    }
+  }
+
+  var maskFormatter = MaskTextInputFormatter(
+      mask: '###-####',
+      filter: {"#": RegExp(r'[0-9]')},
+      type: MaskAutoCompletionType.lazy);
+
+  void setTypeDoc(String? type) {
+    typeDniSelected = type ?? typesDocs[0];
   }
 
   getDefaultData() async {}
@@ -79,6 +131,67 @@ class RegisterModal extends StatelessWidget {
               Form(
                 child: Column(
                   children: [
+                    Row(
+                      children: [
+                        SizedBox(
+                            width: 80.0,
+                            height: 75.0,
+                            child: DropdownButtonFormField<String>(
+                              decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.blue, width: 2))),
+                              icon: const Icon(Icons.arrow_downward),
+                              value: typeDniSelected,
+                              elevation: 16,
+                              style: const TextStyle(
+                                  color: Colors.deepPurple,
+                                  fontFamily: "Kalinga"),
+                              isExpanded: true,
+                              onChanged: (type) => setTypeDoc(type),
+                              items: typesDocs
+                                  .map<DropdownMenuItem<String>>((String type) {
+                                return DropdownMenuItem<String>(
+                                    value: type,
+                                    child: Center(
+                                      child: Text(type,
+                                          style: const TextStyle(
+                                              color: Colors.grey)),
+                                    ));
+                              }).toList(),
+                            )),
+                        const SizedBox(width: 10.0),
+                        Expanded(
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            enableInteractiveSelection: false,
+                            maxLength: 9,
+                            readOnly: false,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9]')),
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            decoration: const InputDecoration(
+                                /* errorStyle: TextStyle(fontSize: 14), */
+                                prefixIcon: Icon(Icons.person),
+                                labelText: "RIF/CI",
+                                border: OutlineInputBorder(),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.blue, width: 2.0),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.black, width: 1.0),
+                                ),
+                                hintText: ''),
+                          ),
+                        )
+                      ],
+                    ),
                     TextFormField(
                       controller: _fullNameController,
                       decoration: const InputDecoration(
@@ -100,6 +213,65 @@ class RegisterModal extends StatelessWidget {
                       decoration: const InputDecoration(
                         labelText: 'Correo',
                         hintText: 'tucorreo@email.com',
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        SizedBox(
+                            width: 80.0,
+                            height: 75.0,
+                            child: DropdownButtonFormField<String>(
+                              decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.blue, width: 2))),
+                              icon: const Icon(Icons.arrow_downward),
+                              value: typePhoneSelected,
+                              elevation: 16,
+                              style: const TextStyle(
+                                  color: Colors.deepPurple,
+                                  fontFamily: "Kalinga"),
+                              isExpanded: true,
+                              onChanged: (type) => setTypeDoc(type),
+                              items: typesPhones
+                                  .map<DropdownMenuItem<String>>((String type) {
+                                return DropdownMenuItem<String>(
+                                    value: type,
+                                    child: Center(
+                                      child: Text(type,
+                                          style: const TextStyle(
+                                              color: Colors.grey)),
+                                    ));
+                              }).toList(),
+                            )),
+                        const SizedBox(width: 10.0),
+                        Expanded(
+                          child: TextFormField(
+                            controller: phoneController,
+                            keyboardType: TextInputType.number,
+                            maxLength: 8,
+                            readOnly: false,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            inputFormatters: [maskFormatter],
+                            validator: (value) => validateNumber(value),
+                            decoration: const InputDecoration(
+                                labelText: "Número de teléfono",
+                                border: OutlineInputBorder(),
+                                hintText: ''),
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      maxLength: 8, // Limitar a 8 caracteres
+                      onChanged: _onChanged,
+                      decoration: InputDecoration(
+                        labelText: "Ingrese fecha (DDMMYYYY)",
+                        hintText: "Ejemplo: 01012000",
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -134,12 +306,13 @@ class RegisterModal extends StatelessWidget {
                         builder: (context) => PageSwitcher()));
                   },
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
                   ),
                   child: Text('Registrar',
                       style: TextStyle(
-                          color: AppColor.secondary,
+                          color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'inter')),
